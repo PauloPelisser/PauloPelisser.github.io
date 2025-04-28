@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>FURIA - Coleta e Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a0a;
+            color: #f0f0f0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px #ff5500;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        button {
+            background: #ff5500;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #ff7700;
+        }
+        .hidden {
+            display: none;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header img {
+            width: 150px;
+            margin-bottom: 10px;
+        }
+        header h1 {
+            font-size: 2em;
+            color: #ff5500;
+        }
+        .menu button {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="img/Furia_Esports_logo.png" alt="FURIA" class="logo">
+</header>
+
+<div class="container" id="formulario">
+    <h2>Cadastro</h2>
+    <input type="text" id="nome" placeholder="Nome" required>
+    <input type="text" id="endereco" placeholder="Endereço" required>
+    <input type="text" id="cpf" placeholder="CPF" required>
+    <input type="email" id="email" placeholder="E-mail" required>
+    <button onclick="mostrarMenu()">Cadastrar</button>
+</div>
+
+<div class="container hidden" id="menu">
+    <h2>Menu Principal</h2>
+    <div class="menu">
+        <button onclick="abrirParceiros()">Parceiros</button>
+        <button onclick="mostrarFeedback()">Feedback para Melhorias</button>
+        <button onclick="irParaQuiz()">Quiz FURIA</button>
+        <button onclick="abrirChat()">Furia Chat</button>
+        <button onclick="registrarCompras()">Registrar Compras</button> <!-- Novo botão -->
+    </div>
+</div>
+
+<div class="container hidden" id="parceiros">
+    <h2>Parceiros da FURIA</h2>
+    <button onclick="window.open('https://www.youtube.com/@fallenINSIDER/videos', '_blank')">Fallen</button>
+    <button onclick="window.open('https://www.youtube.com/@FURIAF.C.', '_blank')">FURIA FC</button>
+    <button onclick="voltarMenu()">Voltar ao Menu</button>
+</div>
+
+<div class="container hidden" id="feedback">
+    <h2>Feedback para Melhorias</h2>
+    <textarea id="campoFeedback" placeholder="Deixe seu feedback aqui..."></textarea>
+    <button onclick="enviarFeedback()">Enviar Feedback</button>
+    <button onclick="voltarMenu()">Voltar ao Menu</button>
+</div>
+
+<div class="container hidden" id="escolherTema">
+    <h2>Escolha o Tema do Quiz FURIA</h2>
+    <select id="tema">
+        <option value="lol">League of Legends</option>
+        <option value="valorant">Valorant</option>
+        <option value="cs">Counter Strike</option>
+    </select>
+    <button onclick="comecarQuiz()">Começar Quiz</button>
+</div>
+
+<div class="container hidden" id="quiz">
+    <h2 id="pergunta"></h2>
+    <div id="opcoes"></div>
+    <button onclick="proximaPergunta()">Próxima</button>
+</div>
+
+<div class="container hidden" id="resultado">
+    <h2>Resultado</h2>
+    <p id="pontuacao"></p>
+    <button onclick="voltarMenu()">Voltar ao Menu</button>
+</div>
+
+<div class="container hidden" id="compras">
+    <h2>Compras do Último Ano</h2>
+    <input type="text" id="campoCompras" placeholder="Digite suas compras">
+    <button onclick="salvarCompras()">Salvar Compras</button>
+    <button onclick="voltarMenu()">Voltar ao Menu</button>
+</div>
+
+<script>
+    let perguntas = {
+        lol: [
+            {pergunta: "Quem é o mid laner da FURIA no LoL?", opcoes: ["Envy", "Brtt", "Jhin"], resposta: "Envy"},
+            {pergunta: "Em que ano a FURIA entrou no LoL?", opcoes: ["2018", "2020", "2017"], resposta: "2020"}
+        ],
+        valorant: [
+            {pergunta: "Qual o agente favorito da FURIA no Valorant?", opcoes: ["Jett", "Sova", "Raze"], resposta: "Sova"},
+            {pergunta: "Quando a FURIA entrou no cenário de Valorant?", opcoes: ["2021", "2020", "2022"], resposta: "2020"}
+        ],
+        cs: [
+            {pergunta: "Quem é o AWPer da FURIA no CS?", opcoes: ["Kscerato", "Yuurih", "Saffee"], resposta: "Saffee"},
+            {pergunta: "Qual o maior rival da FURIA no CS?", opcoes: ["MIBR", "Liquid", "Faze"], resposta: "MIBR"}
+        ]
+    };
+
+    let temaEscolhido = "";
+    let questaoAtual = 0;
+    let acertos = 0;
+
+    function mostrarMenu() {
+        let nome = document.getElementById('nome').value.trim();
+        let endereco = document.getElementById('endereco').value.trim();
+        let cpf = document.getElementById('cpf').value.trim();
+        let email = document.getElementById('email').value.trim();
+
+        if (!nome || !endereco || !cpf || !email) {
+            alert("Por favor, preencha todos os campos!");
+            return;
+        }
+
+        document.getElementById('formulario').classList.add('hidden');
+        document.getElementById('menu').classList.remove('hidden');
+    }
+
+    function abrirParceiros() {
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('parceiros').classList.remove('hidden');
+    }
+
+    function mostrarFeedback() {
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('feedback').classList.remove('hidden');
+    }
+
+    function irParaQuiz() {
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('escolherTema').classList.remove('hidden');
+    }
+
+    function abrirChat() {
+        window.open('furiadesafio1.html', '_blank');
+    }
+
+    function voltarMenu() {
+        document.querySelectorAll('.container').forEach(div => div.classList.add('hidden'));
+        document.getElementById('menu').classList.remove('hidden');
+    }
+
+    function comecarQuiz() {
+        temaEscolhido = document.getElementById('tema').value;
+        document.getElementById('escolherTema').classList.add('hidden');
+        document.getElementById('quiz').classList.remove('hidden');
+        questaoAtual = 0;
+        acertos = 0;
+        mostrarPergunta();
+    }
+
+    function mostrarPergunta() {
+        let perguntaObj = perguntas[temaEscolhido][questaoAtual];
+        document.getElementById('pergunta').textContent = perguntaObj.pergunta;
+        let opcoesDiv = document.getElementById('opcoes');
+        opcoesDiv.innerHTML = "";
+        perguntaObj.opcoes.forEach(opcao => {
+            let botao = document.createElement('button');
+            botao.textContent = opcao;
+            botao.onclick = () => {
+                escolherResposta(opcao);
+                document.querySelector("#quiz button").style.display = "block"; // Mostra "Próxima" após resposta
+            };
+            opcoesDiv.appendChild(botao);
+        });
+        document.querySelector("#quiz button").style.display = "none"; // Esconde no início
+    }
+
+    function escolherResposta(resposta) {
+        let perguntaObj = perguntas[temaEscolhido][questaoAtual];
+        if (resposta === perguntaObj.resposta) {
+            acertos++;
+        }
+        document.querySelectorAll("#opcoes button").forEach(btn => btn.disabled = true);
+    }
+
+    function proximaPergunta() {
+        questaoAtual++;
+        if (questaoAtual < perguntas[temaEscolhido].length) {
+            mostrarPergunta();
+        } else {
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('resultado').classList.remove('hidden');
+            document.getElementById('pontuacao').textContent = `Você acertou ${acertos} de ${perguntas[temaEscolhido].length} perguntas!`;
+        }
+    }
+
+    function enviarFeedback() {
+        let feedback = document.getElementById('campoFeedback').value;
+        alert("Obrigado pelo seu feedback: " + feedback);
+        voltarMenu();
+    }
+
+    function registrarCompras() {
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('compras').classList.remove('hidden');
+    }
+
+    function salvarCompras() {
+        let compras = document.getElementById('campoCompras').value.trim();
+        if (compras) {
+            alert("Compras registradas: " + compras);
+            voltarMenu();
+        } else {
+            alert("Por favor, insira suas compras!");
+        }
+    }
+</script>
+
+</body>
+</html>
+

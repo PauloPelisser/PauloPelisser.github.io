@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FURIA Chatbot</title>
+
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .side-img {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 300px;
+      height: auto;
+      opacity: 0.9;
+      z-index: 1;
+    }
+
+    .left {
+      left: 30px;
+    }
+
+    .right {
+      right: 30px;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo {
+      width: 100px;
+      margin-bottom: 20px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    #chatbox {
+      background-color: #111;
+      padding: 20px;
+      border-radius: 10px;
+      height: 400px;
+      overflow-y: auto;
+      text-align: left;
+      margin-bottom: 10px;
+    }
+
+    .bot-message, .user-message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 10px;
+      max-width: 80%;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .bot-message {
+      background-color: #333;
+      text-align: left;
+    }
+
+    .user-message {
+      background-color: #555;
+      text-align: right;
+      margin-left: auto;
+    }
+
+    #chat-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    #user-input {
+      flex-grow: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #fff;
+      color: #000;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ddd;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Imagens laterais -->
+  <img src="img/fallen-furia.webp" alt="Mascote 1" class="side-img left">
+  <img src="img/furia-esports.png.webp" alt="Mascote 2" class="side-img right">
+
+  <div class="container">
+    <img src="img/Furia_Esports_logo.png" alt="FURIA" class="logo">
+    <h1>FURIA Chatbot</h1>
+
+    <div id="chatbox">
+      <div class="bot-message">
+        Bem-vindo ao mundo da FURIA! ⚡ Digite "Olá" para começar.
+      </div>
+    </div>
+
+    <form id="chat-form">
+      <input type="text" id="user-input" placeholder="Digite sua mensagem..." autocomplete="off" required>
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+
+  <script>
+    const chatForm  = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const chatbox   = document.getElementById('chatbox');
+
+    let aguardandoPergunta = false;
+
+    const respostas = {
+      "pgl":      "A FURIA está programada para competir no PGL Cluj-Napoca 2025! Fase de grupos: 14 a 18 de fevereiro; Playoffs: 21 a 23 de fevereiro. Local: BT Arena, Romênia. Premiação: US$ 1,25 milhão.",
+      "blast":    "A FURIA participará do BLAST.tv Major: Austin 2025. Datas: 3 a 22 de junho. Local: Moody Center, Texas, EUA. Premiação: US$ 1,25 milhão.",
+      "valorant": "A FURIA participou do Valorant Champions Tour: Americas KICK-OFF 2025, enfrentando a Evil Geniuses em 23 de janeiro. No momento, sem novos jogos anunciados.",
+      "lol":      "A equipe de LoL da FURIA está jogando a LTA Sul 2025 – Etapa 2. Próximos jogos: 12/4 vs paiN Gaming, 13/4 vs Fluxo W7M, 19/4 vs RED Canids, 20/4 vs Keyd Stars, 21/4 vs LOUD."
+    };
+
+    const links = {
+      "rede": "https://x.com/FURIA",
+      "loja": "https://www.furia.gg/",
+      "whatsapp": "https://api.whatsapp.com/send?l=pt&phone=5511945128297&text=Poderia%20me%20ajudar?"
+    };
+
+    chatForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const pergunta = userInput.value.trim().toLowerCase();
+      addMessage(pergunta, "user-message");
+
+      if (aguardandoPergunta) {
+        if (pergunta.includes("pgl")) {
+          responder(respostas.pgl);
+        } else if (pergunta.includes("blast")) {
+          responder(respostas.blast);
+        } else if (pergunta.includes("valorant")) {
+          responder(respostas.valorant);
+        } else if (pergunta.includes("lol")) {
+          responder(respostas.lol);
+        } else if (pergunta.includes("rede")) {
+          abrirLink(links.rede);
+        } else if (pergunta.includes("loja")) {
+          abrirLink(links.loja);
+        } else if (pergunta.includes("whatsapp")) {
+          abrirLink(links.whatsapp);
+        } else {
+          responder("Escolha inválida. Por favor, digite uma das opções mostradas.");
+        }
+      } else {
+        if (pergunta === "olá" || pergunta === "ola") {
+          mostrarPerguntas();
+          aguardandoPergunta = true;
+        } else {
+          responder('Digite "Olá" para começar o menu de perguntas!');
+        }
+      }
+
+      userInput.value = '';
+    });
+
+    function addMessage(text, className) {
+      const msg = document.createElement('div');
+      msg.className = className;
+      msg.textContent = text;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function responder(texto) {
+      setTimeout(() => {
+        addMessage(texto, "bot-message");
+      }, 500);
+    }
+
+    function mostrarPerguntas() {
+      const menu = `Escolha uma opção:
+- PGL
+- BLAST
+- VALORANT
+- LOL
+- LOJA
+- WHATSAPP
+- REDE SOCIAL`;
+      responder(menu);
+    }
+
+    function abrirLink(url) {
+      responder("Abrindo o link...");
+      setTimeout(() => {
+        window.open(url, "_blank");
+      }, 500);
+    }
+  </script>
+</body>
+</html>
